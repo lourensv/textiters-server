@@ -1,4 +1,5 @@
 #include "NetworkManager.h"
+#include "Client.h"
 
 NetworkManager::NetworkManager(int aPort)
 {
@@ -20,6 +21,7 @@ int NetworkManager::startServer()
 	return true;
 }
 
+
 void NetworkManager::closeSocket()
 {
 	if (serverSocket) {
@@ -39,7 +41,7 @@ boolean NetworkManager::createSocket()
 	serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (serverSocket < 0)
 	{
-		printf("\nSocket Creation FAILED!");
+		printf("Socket Creation FAILED!\n");
 		return false;
 	}
 	return true;
@@ -50,7 +52,7 @@ boolean NetworkManager::bindSocket()
 	destination.sin_port = htons(port);
 	destination.sin_addr.s_addr = INADDR_ANY;
 	if (bind(serverSocket, (struct sockaddr *)&destination, sizeof(destination)) < 0) {
-		printf("\nBinding Socket FAILED!\n");
+		printf("Binding Socket FAILED!\n");
 		closeSocket();
 		return false;
 	}
@@ -59,9 +61,9 @@ boolean NetworkManager::bindSocket()
 
 boolean NetworkManager::listenOnSocket()
 {
-	printf("\nListening");
+	printf("\nListening\n");
 	if (listen(serverSocket, 5) < 0) {
-		printf("\nListening on Socket FAILED!\n");
+		printf("Listening on Socket FAILED!\n");
 		closeSocket();
 		return false;
 	}
@@ -73,15 +75,33 @@ boolean NetworkManager::acceptConnection()
 
 	struct sockaddr_in clientAddress;
 	int clientSize = sizeof(clientAddress);
+	pthread_t sniffer_thread[MAXSOCK];
+	int c = 0;
 	while (true) {
-		int client = accept(serverSocket, (struct sockaddr *)&clientAddress, (int *)&clientSize);
-		if (client < 0)
+
+		int sock = accept(serverSocket, (struct sockaddr *)&clientAddress, (int *)&clientSize);
+		if (sock < 0)
 		{
-			printf("\nSocket Connection FAILED!\n");
+			printf("Socket Connection FAILED!\n");
 			closeSocket();
 			return false;
 		}
-		printf("\nConnection Established!");
+		
+		int p = -1;
+		Client client(sock);
+		if (p = pthread_create(&sniffer_thread[c], NULL, connection_handler, (void*)&client) < 0)
+		{
+			perror("could not create thread\n");
+			return 1;
+		}		
+		c++;
 	}
 	return true;
+}
+
+void *NetworkManager::connection_handler(void *sClient)
+{	
+	Client client = *(Client*)sClient;
+	client.getSock();		
+	return 0;
 }
