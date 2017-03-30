@@ -73,13 +73,15 @@ boolean NetworkManager::acceptConnection()
 
 	struct sockaddr_in clientAddress;
 	int clientSize = sizeof(clientAddress);
-	serverSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, (int *)&clientSize);
-	if (serverSocket < 0)
-	{
-		printf("\nSocket Connection FAILED!\n");
-		closeSocket();
-		return false;
+	while (true) {
+		int client = accept(serverSocket, (struct sockaddr *)&clientAddress, (int *)&clientSize);
+		if (client < 0)
+		{
+			printf("\nSocket Connection FAILED!\n");
+			closeSocket();
+			return false;
+		}
+		printf("\nConnection Established!");
 	}
-	printf("\nConnection Established!");
 	return true;
 }
