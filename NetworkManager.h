@@ -7,10 +7,10 @@
 #include <winsock.h>
 #endif
 
-#ifdef __linux__
+#ifndef _WIN32
 #include <sys/types.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
 #include <arpa/inet.h>
 #endif
 
@@ -25,10 +25,10 @@ public:
 
 private:
 	void closeSocket();
-	boolean createSocket();
-	boolean bindSocket();
-	boolean listenOnSocket();
-	boolean acceptConnection();
+	bool createSocket();
+	bool bindSocket();
+	bool listenOnSocket();
+	bool acceptConnection();
 
 	int port;
 	int serverSocket;

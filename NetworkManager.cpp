@@ -24,18 +24,18 @@ int NetworkManager::startServer()
 
 void NetworkManager::closeSocket()
 {
-	if (serverSocket) {
+	if (serverSocket) 
+	{
 #ifdef _WIN32
 		WSACleanup();
 #endif
-
-#ifdef __linux__
+#ifndef _WIN32
 		close(serverSocket);
 #endif
 	}
 }
 
-boolean NetworkManager::createSocket()
+bool NetworkManager::createSocket()
 {
 	destination.sin_family = AF_INET;
 	serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -47,7 +47,7 @@ boolean NetworkManager::createSocket()
 	return true;
 }
 
-boolean NetworkManager::bindSocket()
+bool NetworkManager::bindSocket()
 {
 	destination.sin_port = htons(port);
 	destination.sin_addr.s_addr = INADDR_ANY;
@@ -59,7 +59,7 @@ boolean NetworkManager::bindSocket()
 	return true;
 }
 
-boolean NetworkManager::listenOnSocket()
+bool NetworkManager::listenOnSocket()
 {
 	printf("\nListening\n");
 	if (listen(serverSocket, 5) < 0) {
@@ -70,16 +70,18 @@ boolean NetworkManager::listenOnSocket()
 	return true;
 }
 
-boolean NetworkManager::acceptConnection()
+bool NetworkManager::acceptConnection()
 {
-
 	struct sockaddr_in clientAddress;
 	int clientSize = sizeof(clientAddress);
+	struct sockaddr *cli_addr = (struct sockaddr *)&clientAddress;
+	socklen_t clilen = (socklen_t)clientSize;
+
 	pthread_t sniffer_thread[MAXSOCK];
 	int c = 0;
 	while (true) {
 
-		int sock = accept(serverSocket, (struct sockaddr *)&clientAddress, (int *)&clientSize);
+		int sock = accept(serverSocket, cli_addr, &clilen);
 		if (sock < 0)
 		{
 			printf("Socket Connection FAILED!\n");
