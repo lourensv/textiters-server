@@ -8,12 +8,12 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-void closeSocket(int socket) {
-	#ifdef _WIN32
-		WSACleanup();
-	#endif
 
-	#ifdef __linux__
-		close(socket);
-	#endif
-}
+
+
+
+
+
+
+
+

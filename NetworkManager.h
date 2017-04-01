@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <pthread.h>
+#include <stdio.h>
 
 #ifdef _WIN32
 #pragma comment(lib , "ws2_32.lib")
@@ -8,6 +9,7 @@
 #endif
 
 #ifndef _WIN32
+#include <unistd.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
