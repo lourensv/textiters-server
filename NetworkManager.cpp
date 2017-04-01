@@ -13,6 +13,10 @@ int NetworkManager::startServer()
 	WSAStartup(0x0202, &wsaData);
 #endif
 
+	destination.sin_family = AF_INET;
+	destination.sin_port = htons(port);
+	destination.sin_addr.s_addr = INADDR_ANY;
+
 	if (!createSocket()) return false;
 	if (!bindSocket()) return false;
 	if (!listenOnSocket()) return false;
@@ -37,7 +41,6 @@ void NetworkManager::closeSocket()
 
 bool NetworkManager::createSocket()
 {
-	destination.sin_family = AF_INET;
 	serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (serverSocket < 0)
 	{
@@ -49,8 +52,6 @@ bool NetworkManager::createSocket()
 
 bool NetworkManager::bindSocket()
 {
-	destination.sin_port = htons(port);
-	destination.sin_addr.s_addr = INADDR_ANY;
 	if (bind(serverSocket, (struct sockaddr *)&destination, sizeof(destination)) < 0) {
 		printf("Binding Socket FAILED!\n");
 		closeSocket();
@@ -74,14 +75,22 @@ bool NetworkManager::acceptConnection()
 {
 	struct sockaddr_in clientAddress;
 	int clientSize = sizeof(clientAddress);
-	struct sockaddr *cli_addr = (struct sockaddr *)&clientAddress;
-	socklen_t clilen = (socklen_t)clientSize;
+	struct sockaddr *cli_addr = (struct sockaddr *) &clientAddress;
+#ifndef _WIN32
+	socklen_t clilen = (socklen_t) clientSize;
+#endif
 
 	pthread_t sniffer_thread[MAXSOCK];
 	int c = 0;
 	while (true) {
 
+#ifdef _WIN32
+		int sock = accept(serverSocket, cli_addr, (int *) &clientSize);
+#endif
+#ifndef _WIN32
 		int sock = accept(serverSocket, cli_addr, &clilen);
+#endif
+
 		if (sock < 0)
 		{
 			printf("Socket Connection FAILED!\n");
@@ -91,7 +100,7 @@ bool NetworkManager::acceptConnection()
 		
 		int p = -1;
 		Client client(sock);
-		if (p = pthread_create(&sniffer_thread[c], NULL, connection_handler, (void*)&client) < 0)
+		if (p = pthread_create(&sniffer_thread[c], NULL, connection_handler, (void*) &client) < 0)
 		{
 			perror("could not create thread\n");
 			return 1;
