@@ -158,6 +158,7 @@
     <ClInclude Include="Client.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="NetworkManager.h" />
+    <ClInclude Include="sockets.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

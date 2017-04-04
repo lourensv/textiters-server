@@ -3,12 +3,15 @@
 #include <iostream>
 #include <stdio.h>
 
+#include "sockets.h"
+
 class Client
 {
 public:
 	Client(int sock);
-	int getSock();
+	int getSocket();
+	void sendMessage(char* buffer, int size);
 
 private:
-	int sock;
+	int socket;
 };

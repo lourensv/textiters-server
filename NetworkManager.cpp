@@ -25,7 +25,6 @@ int NetworkManager::startServer()
 	return true;
 }
 
-
 void NetworkManager::closeSocket()
 {
 	if (serverSocket) 
@@ -112,7 +111,14 @@ bool NetworkManager::acceptConnection()
 
 void *NetworkManager::connection_handler(void *sClient)
 {	
-	Client client = *(Client*)sClient;
-	client.getSock();		
+	char buffer[256];
+	char msg[] = "Message received\n";
+	Client *client = (Client*) sClient;
+	int socket = client->getSocket();
+	while (true) {
+		int size = recv(socket, buffer, 256, 0);
+		printf("Message from %d: %.*s\n", socket, size, buffer);
+		client->sendMessage(msg, sizeof(msg));
+	}
 	return 0;
-}
+} 
