@@ -117,7 +117,13 @@ void *NetworkManager::connection_handler(void *sClient)
 	int socket = client->getSocket();
 	while (true) {
 		int size = recv(socket, buffer, 256, 0);
-		printf("Message from %d: %.*s\n", socket, size, buffer);
+		
+		if (size < 0) {
+			printf("%d disconnected", socket);
+			return 0;
+		}
+
+		printf("Message from %d, size %d: %.*s\n", socket, size, size, buffer);
 		client->sendMessage(msg, sizeof(msg));
 	}
 	return 0;
