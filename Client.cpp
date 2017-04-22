@@ -7,13 +7,12 @@ Client::Client(int sSock)
 
 int Client::getSocket() 
 {
-	printf("Client connected: %i \n", socket);
-
 	return socket;
 }
 
 void Client::startMessageReceiver()
 {
+	printf("Client connected: %i \n", socket);
 	char buffer[256];
 	char msg[] = "Message received\n";
 	while (true) 

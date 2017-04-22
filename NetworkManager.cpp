@@ -92,7 +92,6 @@ bool NetworkManager::acceptConnection()
 #ifndef _WIN32
 		int sock = accept(serverSocket, cli_addr, &clilen);
 #endif
-
 		if (sock < 0)
 		{
 			printf("Socket Connection FAILED!\n");
@@ -100,9 +99,8 @@ bool NetworkManager::acceptConnection()
 			return false;
 		}
 		
-		int p = -1;
-		Client client(sock);
-		if (p = pthread_create(&sniffer_thread[c], NULL, connection_handler, (void*) &client) < 0)
+		int p = pthread_create(&sniffer_thread[c], NULL, connection_handler, (void*) &sock);
+		if (p < 0)
 		{
 			perror("could not create thread\n");
 			return 1;
@@ -112,9 +110,11 @@ bool NetworkManager::acceptConnection()
 	return true;
 }
 
-void *NetworkManager::connection_handler(void *sClient)
+void *NetworkManager::connection_handler(void *sock)
 {	
-	Client *client = (Client*) sClient;
-	client->startMessageReceiver();
-	return 0;
+	int socket = *(int*)sock;
+	printf("connection_handler:pos:%d\n", socket);
+	Client client(socket);
+	client.startMessageReceiver();
+	pthread_exit(NULL);
 } 
