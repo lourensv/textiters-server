@@ -11,6 +11,7 @@ public:
 	Client(int sock);
 	int getSocket();
 	void sendMessage(char* buffer, int size);
+	void startMessageReceiver();
 
 private:
 	int socket;

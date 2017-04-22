@@ -51,7 +51,8 @@ bool NetworkManager::createSocket()
 
 bool NetworkManager::bindSocket()
 {
-	if (bind(serverSocket, (struct sockaddr *)&destination, sizeof(destination)) < 0) {
+	if (bind(serverSocket, (struct sockaddr *)&destination, sizeof(destination)) < 0) 
+	{
 		printf("Binding Socket FAILED!\n");
 		closeSocket();
 		return false;
@@ -62,7 +63,8 @@ bool NetworkManager::bindSocket()
 bool NetworkManager::listenOnSocket()
 {
 	printf("\nListening\n");
-	if (listen(serverSocket, 5) < 0) {
+	if (listen(serverSocket, 5) < 0) 
+	{
 		printf("Listening on Socket FAILED!\n");
 		closeSocket();
 		return false;
@@ -81,7 +83,8 @@ bool NetworkManager::acceptConnection()
 
 	pthread_t sniffer_thread[MAXSOCK];
 	int c = 0;
-	while (true) {
+	while (true) 
+	{
 
 #ifdef _WIN32
 		int sock = accept(serverSocket, cli_addr, (int *) &clientSize);
@@ -111,20 +114,7 @@ bool NetworkManager::acceptConnection()
 
 void *NetworkManager::connection_handler(void *sClient)
 {	
-	char buffer[256];
-	char msg[] = "Message received\n";
 	Client *client = (Client*) sClient;
-	int socket = client->getSocket();
-	while (true) {
-		int size = recv(socket, buffer, 256, 0);
-		
-		if (size < 0) {
-			printf("%d disconnected", socket);
-			return 0;
-		}
-
-		printf("Message from %d, size %d: %.*s\n", socket, size, size, buffer);
-		client->sendMessage(msg, sizeof(msg));
-	}
+	client->startMessageReceiver();
 	return 0;
 } 
